@@ -4,13 +4,13 @@ require(mvtnorm)
 
 ###Generating the data
 n.iter<-100
-sigma<-2
-ndata<-200
+sigma<-0.5
+ndata<-100
 w1<-0.5                             ###mixture weights
 w2<-1-w1
 u<-runif(ndata)<w1
-y<-u*rnorm(ndata, mean = -2, sd = sigma)+(1-u)*rnorm(ndata, mean = 2, sd = sigma)
-
+y<-u*rnorm(ndata, mean = -3, sd = sigma)+(1-u)*rnorm(ndata, mean = 3, sd = sigma)
+hist(y)
 
 ###Generating the plot grid
 x.points <-seq(-5,5,length.out=100)
@@ -29,7 +29,9 @@ estEP<-EPGM(n = length(y),x = y,iter = n.iter,likelihood_var = sigma,w = 0.5)
 estVB.mean<-estVB[1,]
 estVB.CovMat<-matrix(c(estVB[2,1],0,0,estVB[2,2]),2,2)
 estEP.mean<-estEP$mu[,dim(estEP$mu)[2]]
-estEP.CovMat<-round(matrix(c(estEP$Sigma[,(dim(estEP$Sigma)[2]-1):dim(estEP$Sigma)[2]]),2,2))
+#estEP.CovMat<-round(matrix(c(estEP$Sigma[,(dim(estEP$Sigma)[2]-1):dim(estEP$Sigma)[2]]),2,2))
+estEP.CovMat<-matrix(c(estEP$Sigma[,(dim(estEP$Sigma)[2]-1):dim(estEP$Sigma)[2]]),2,2)
+#estEP.CovMat<-matrix(c(estEP$Sigma[,3:4]),2,2)
 
 
 model <- function(p, y) {
