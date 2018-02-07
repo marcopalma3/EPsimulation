@@ -21,24 +21,6 @@ library(coda)
 library(mvtnorm)
 library(lattice)
 
-# Laplace approximation
-laplace_approx <- function(model, inits, no_samples, ...) {
-  fit <- optim(inits, model, control = list(fnscale = -1), hessian = TRUE, ...)
-  param_mean <- fit$par
-  print(param_mean)
-  param_cov_mat <- solve(-fit$hessian)
-  #print(round(param_cov_mat,8))
-  return(list("PosteriorMean"=param_mean,"CovMat"=param_cov_mat,"samp"=mcmc(rmvnorm(no_samples, param_mean, param_cov_mat))))
-}
-
-sigma<-0.5
-ndata<-100000
-set.seed(332)
-u<-runif(ndata)<w1
-y<-u*rnorm(ndata, mean = -3, sd = sigma)+(1-u)*rnorm(ndata, mean = 3, sd = sigma)
-
-
-
 model <- function(p, y) {
   #log_lik<-sum(w1*dnorm(y, p["mu1"], sigma)+(1-w1)*dnorm(y, p["mu2"], sigma, log = T))
   log_lik<-sum(log(w1*dnorm(y, p["mu1"], sigma)+(1-w1)*dnorm(y, p["mu2"], sigma)))
@@ -46,36 +28,15 @@ model <- function(p, y) {
   log_post
 }
 
-inits <- c(mu1 = 0, mu2 = 1.13)
-samples <- laplace_approx(model, inits, 100000, y = y)
-densityplot(samples$samp)
-
-
-
-require(grDevices) # for colours
-require(mvtnorm)
-x.points <-seq(-5,5,length.out=100)
-y.points <-x.points
-z.post<-matrix(0,nrow=100,ncol=100)
-z.lap<-z.post
-###Posterior distribution
-mu1<-c(3,-3)                         ###centers of bivariate distributions
-mu2<-c(-3,3)
-sigma.mat <-matrix(c(sigma,0,0,sigma),nrow=2)   ###covariance matrix(fixed)
-w1<-0.5                             ###mixture weights
-w2<-1-w1
-for (i in 1:100) {
-  for (j in 1:100) {
-    z.post[i,j] <-w1*dmvnorm(c(x.points[i],y.points[j]),mean=mu1,sigma=sigma.mat)+w2*dmvnorm(c(x.points[i],y.points[j]),mean=mu2,sigma=sigma.mat)
-  }
+# Laplace approximation
+laplace_approx <- function(model, inits = c(mu1 = 0, mu2 = 1.13), no_samples, ...) {
+  fit <- optim(inits, model, control = list(fnscale = -1), hessian = TRUE, ...)
+  param_mean <- fit$par
+  #print(param_mean)
+  param_cov_mat <- solve(-fit$hessian)
+  #print(round(param_cov_mat,8))
+  return(list("PosteriorMean"=param_mean,"CovMat"=param_cov_mat,"samp"=mcmc(rmvnorm(no_samples, param_mean, param_cov_mat))))
 }
-filled.contour(x.points,y.points,z.post,color = terrain.colors,asp=1)
 
-for (i in 1:100) {
-  for (j in 1:100) {
-    #z[i,j] <-dmvnorm(c(x.points[i],y.points[j]),mean=c(-3,3),sigma=sigma.mat)
-    z.lap[i,j] <-dmvnorm(c(x.points[i],y.points[j]),mean=samples$PosteriorMean,sigma=sigma.mat)
-  }
-}
-contour(x.points,y.points,z,add=TRUE,col=2)
-contour(x.points,y.points,z.lap,add=TRUE)
+#samples <- laplace_approx(model, inits, 100000, y = y)
+#densityplot(samples$samp)

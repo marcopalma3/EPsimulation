@@ -1,8 +1,8 @@
-theta <- c(-1,1)
-sigma <- 0.25
-n <- 100
-ind <- sample(c(1,2), n, replace = TRUE)
-data <- rnorm(n, sd = sigma) + theta[ind] 
+# theta <- c(-1,1)
+# sigma <- 0.25
+# n <- 100
+# ind <- sample(c(1,2), n, replace = TRUE)
+# data <- rnorm(n, sd = sigma) + theta[ind] 
 
 
 
