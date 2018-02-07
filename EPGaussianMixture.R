@@ -43,7 +43,7 @@ EPGM = function(n,x,iter,likelihood_var = 1,w){
       mu_hat = Sigma_hat %*% (solve(Sigma__i) %*% mu__i + matrix(c(0,0,0,likelihood_var),2,2) %*% matrix(c(0,x[i]),2,1))
       
       mu_prime = w * mu_star + (1-w) * mu_hat
-      Sigma_prime = w * Sigma_star + (1-w) * Sigma_hat + (mu_star - mu_hat) %*% t(mu_star - mu_hat)
+      Sigma_prime = w * Sigma_star + (1-w) * Sigma_hat + w*(1-w)*(mu_star - mu_hat) %*% t(mu_star - mu_hat)
       
       mu = mu_prime
       Sigma = Sigma_prime
